@@ -53,7 +53,7 @@ main{
     border: 1px solid #979797;
     height: 50px;
     line-height: 50px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .x-article-list li a{
     display: block;
