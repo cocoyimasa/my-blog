@@ -6,7 +6,7 @@
 
 只要支持模板、支持lambda表达式或函数指针或委托，且能重载运算符的强类型语言其实都可以。
 
-```
+```cpp
 template<typename T>
 class Monad {
 public:
@@ -31,7 +31,7 @@ Monad<T>* id(T* a) { //pack,return
 
 然后Parser就可以写成这样:
 
-```
+```cpp
 class Parser {
 public:
     int id;
