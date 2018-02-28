@@ -25,7 +25,19 @@ template<typename T>
 Monad<T>* id(T* a) { //pack,return
 	return new Monad<T>(a);
 }
-
+class Node{
+public:
+	Node(){
+	}
+}
+class Statement: public Node{
+public:
+	Statement(){
+	}
+}
+bool match(){
+	return 
+}
 class Parser {
 public:
 	int id;
@@ -67,6 +79,8 @@ public:
 };
 class IfParser : public Parser {
 public:
+	Expression cond;
+	Statement body;
 	IfParser() {
 
 	}
@@ -74,7 +88,7 @@ public:
 		this->id = id;
 	}
 	void Parse() {
-		// do something
+		match
 	}
 };
 
