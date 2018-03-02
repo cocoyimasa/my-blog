@@ -25,18 +25,27 @@ template<typename T>
 Monad<T>* id(T* a) { //pack,return
 	return new Monad<T>(a);
 }
+class Token{
+public:
+	Token(){}
+};
 class Node{
 public:
 	Node(){
 	}
-}
+};
 class Statement: public Node{
 public:
 	Statement(){
 	}
-}
-bool match(){
-	return 
+};
+class Expression: public Node{
+public:
+	Expression(){
+	}
+};
+bool match(Token x,Token y){
+	return x==y;
 }
 class Parser {
 public:
