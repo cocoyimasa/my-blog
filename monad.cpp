@@ -150,11 +150,15 @@ int main() {
 		a->Parse();
 		return new Monad<Parser>(new EndParser(a->id + 1));
 	};
-	Monad<Parser>* parserS = pm >> f >> g >> h >> m >> end; //做的基础设施就是为了这样串起来
+	Monad<Parser>* parserS = pm >> f >> g >> h >> m >> end; //做的基础设施就是为了这样串起来..
+	Monad<Parser>* F = OP('(') >> E_F >> OP(')') | Number;
+	Monad<Parser>* Tp = (OP('*')|OP('/')) >> F_F | Nop_F;
+	Monad<Parser>* T = F_F >> Tp_F;
+	Monad<Parser>* Ep = (OP('+')|OP('-')) >> T_F | Nop_F;
+	Monad<Parser>* E = T_F >> Ep_F;
 	Monad<Parser>* Binary_F = Expression >> (OP('||') | OP('&&') |) >> Expression;
 	Monad<Parser> Unary = (OP('+')|OP('-')|OP('::'))Expression;
 	Monad<Parser>* Expression = Identify_F | Unary_F | Binary_F | Ternary_F;
-	Monad<Parser>* parserS = pm >> f >> g >> h >> m >> end; //做的基础设施就是为了这样串起来
 	Monad<Parser>* IF = Keyword_F('IF') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* ELSE = Keyword_F('ELSE') >> Optional(OP('{')) >> Body_F >> Optional(OP('}'));
 	Monad<Parser>* FOR = Keyword_F('FOR') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
