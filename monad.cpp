@@ -141,7 +141,7 @@ int main() {
 	function<Monad<Parser>*(Parser*)> h = [](Parser* a) {
 		a->Parse();
 		return new Monad<Parser>(new ForParser(a->id + 1));
-	};
+ 	};
 	function<Monad<Parser>*(Parser*)> m = [](Parser* a) {
 		a->Parse();
 		return new Monad<Parser>(new ExpressionParser(a->id + 1));
@@ -172,13 +172,22 @@ int main() {
 	//基础表达式
 	Monad<Parser>* Nop = id(NULL);
 	Monad<Parser>* Identify = id(TokenType.Identify);
-	Monad<Parser>* IntNumber = id(TokenType.Int);
-	Monad<Parser>* FloatNumber = id(TokenType.Float);
-	Monad<Parser>* String = id(TokenType.String);
-	Monad<Parser>* Bool = id(TokenType.Bool);
-	Monad<Parser>* Base = Identify | IntNumber | FloatNumber | String | Bool;
+	Monad<Parser>* CharNumberVal = id(TokenType.Char);
+	Monad<Parser>* ShortNumberVal = id(TokenType.Short);
+	Monad<Parser>* IntNumberVal = id(TokenType.Int);
+	Monad<Parser>* LongNumberVal = id(TokenType.Long);
+	Monad<Parser>* FloatNumberVal = id(TokenType.Float);
+	Monad<Parser>* DoubleNumberVal = id(TokenType.Double);
+	Monad<Parser>* StringVal = id(TokenType.String);
+	Monad<Parser>* BoolVal = id(TokenType.Bool);
+	
+	Monad<Parser>* BaseVal = Identify | CharNumberVal | ShortNumberVal | IntNumberVal | LongNumberVal |
+		FloatNumber | DoubleNumberVal | StringVal | BoolVal;
+	//类型
+	Monad<Parser>* Type = Keyword('char') | Keyword('short') | Keyword('int') | Keyword('long')
+		Keyword('float') | Keyword('double') | Keyword('string') | Keyword('bool');
 	//数组
-	Monad<Parser>* Array = OP('{')>> Base_F >> KleeneStar(OP(',') >> Base_F) >> OP('}') | OP('{')>> Number_F(0) >>OP('}')
+	Monad<Parser>* Array = OP('{')>> Base_F >> KleeneStar(OP(',') >> BaseVal_F) >> OP('}') | OP('{')>> Number_F(0) >>OP('}')
 	//算术表达式
 	Monad<Parser>* F = OP('(') >> E_F >> OP(')') | Number;
 	Monad<Parser>* Tp = (OP('*')|OP('/')) >> F_F | Nop_F;
@@ -190,13 +199,14 @@ int main() {
 	//
 	Monad<Parser> Unary = ( OP(!) | OP('+') | OP('-') | OP('::') )Expression;
 	
-	Monad<Parser>* Expression = Identify_F | Unary_F | Binary_F | Ternary_F;
-	Monad<Parser>* Arg_List = Type_F >> Identify_F >> KleeneStar(OP(',') >> Type_F >> Identify_F) | Nop;//形参列表
-	Monad<Parser>* Body = Statement_F >> KleeneStar(Statement_F);
+	Monad<Parser>* Expression = Identify >> Identify_F| BaseVal >> BaseVal_F | Unary_F | Binary_F | Ternary_F;
+	Monad<Parser>* Arg_List = Type >> Type_F >> Identify_F >> KleeneStar(OP(',') >> Type_F >> Identify_F) | Nop;//形参列表
+	Monad<Parser>* bindSt = Type >> Type_F >> Identify_F >> OP('=') >> Expression_F;
+	Monad<Parser>* Body = Statement >> Statement_F >> KleeneStar(Statement_F) | Nop;
 	Monad<Parser>* IF = Keyword_F('IF') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* ELSE = Keyword_F('ELSE') >> Optional(OP('{')) >> Body_F >> Optional(OP('}'));
 	Monad<Parser>* FOR = Keyword_F('FOR') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
-	Monad<Parser>* FUNCTION = Type_F >> Identify_F >> OP('(') >> Arg_List_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
+	Monad<Parser>* FUNCTION = Type >> Type_F >> Identify_F >> OP('(') >> Arg_List_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	
 	cout << parserS->val->id << endl;
 	//wcout << TS(val) << endl;
