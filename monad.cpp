@@ -151,18 +151,53 @@ int main() {
 		return new Monad<Parser>(new EndParser(a->id + 1));
 	};
 	Monad<Parser>* parserS = pm >> f >> g >> h >> m >> end; //做的基础设施就是为了这样串起来..
+	//基础设施
+	function<Monad<Parser>*(Parser*)> operator| = [](function<Monad<Parser>* a) {
+		//...
+		return function<Monad<Parser>*(Parser*)>(???);
+	};
+	function<Monad<Parser>*(Parser*)> Optional = [](function<Monad<Parser>* a) {
+		//...
+		return function<Monad<Parser>*(Parser*)>(???);
+	};
+	function<Monad<Parser>*(Parser*)> KleeneStar = [](function<Monad<Parser>* a) {
+		//...
+		return function<Monad<Parser>*(Parser*)>(???);
+	};
+	//统一风格的函数，名字使用XXX，考虑生成用宏这一系列函数
+	function<Monad<Parser>*(Parser*)> XXX_F = [](Parser* a) {
+		a->Parse(TokenList,startIterator);//先parser上一步的Token，然后生成本步的parser.
+		return new Monad<Parser>(new XXXParser(TokenList,startIterator));
+	};
+	//基础表达式
+	Monad<Parser>* Nop = id(NULL);
+	Monad<Parser>* Identify = id(TokenType.Identify);
+	Monad<Parser>* IntNumber = id(TokenType.Int);
+	Monad<Parser>* FloatNumber = id(TokenType.Float);
+	Monad<Parser>* String = id(TokenType.String);
+	Monad<Parser>* Bool = id(TokenType.Bool);
+	Monad<Parser>* Base = Identify | IntNumber | FloatNumber | String | Bool;
+	//数组
+	Monad<Parser>* Array = OP('{')>> Base_F >> KleeneStar(OP(',') >> Base_F) >> OP('}') | OP('{')>> Number_F(0) >>OP('}')
+	//算术表达式
 	Monad<Parser>* F = OP('(') >> E_F >> OP(')') | Number;
 	Monad<Parser>* Tp = (OP('*')|OP('/')) >> F_F | Nop_F;
 	Monad<Parser>* T = F_F >> Tp_F;
 	Monad<Parser>* Ep = (OP('+')|OP('-')) >> T_F | Nop_F;
 	Monad<Parser>* E = T_F >> Ep_F;
-	Monad<Parser>* Binary_F = Expression >> (OP('||') | OP('&&') |) >> Expression;
-	Monad<Parser> Unary = (OP('+')|OP('-')|OP('::'))Expression;
+	//逻辑表达式，可参照算术表达式文法形式
+	Monad<Parser>* Binary_F = ...;
+	//
+	Monad<Parser> Unary = ( OP(!) | OP('+') | OP('-') | OP('::') )Expression;
+	
 	Monad<Parser>* Expression = Identify_F | Unary_F | Binary_F | Ternary_F;
+	Monad<Parser>* Arg_List = Type_F >> Identify_F >> KleeneStar(OP(',') >> Type_F >> Identify_F) | Nop;//形参列表
+	Monad<Parser>* Body = Statement_F >> KleeneStar(Statement_F);
 	Monad<Parser>* IF = Keyword_F('IF') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* ELSE = Keyword_F('ELSE') >> Optional(OP('{')) >> Body_F >> Optional(OP('}'));
 	Monad<Parser>* FOR = Keyword_F('FOR') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* FUNCTION = Type_F >> Identify_F >> OP('(') >> Arg_List_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
+	
 	cout << parserS->val->id << endl;
 	//wcout << TS(val) << endl;
 	getchar();
