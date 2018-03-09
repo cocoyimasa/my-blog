@@ -202,12 +202,14 @@ int main() {
 	Monad<Parser>* Expression = Identify >> Identify_F| BaseVal >> BaseVal_F | Unary_F | Binary_F | Ternary_F;
 	Monad<Parser>* Arg_List = Type >> Type_F >> Identify_F >> KleeneStar(OP(',') >> Type_F >> Identify_F) | Nop;//形参列表
 	Monad<Parser>* bindSt = Type >> Type_F >> Identify_F >> OP('=') >> Expression_F;
+	Monad<Parser>* Statement = bindSt | IF | ELSE | FOR | FUNCTION | CLASS;
 	Monad<Parser>* Body = Statement >> Statement_F >> KleeneStar(Statement_F) | Nop;
+	
 	Monad<Parser>* IF = Keyword_F('IF') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* ELSE = Keyword_F('ELSE') >> Optional(OP('{')) >> Body_F >> Optional(OP('}'));
 	Monad<Parser>* FOR = Keyword_F('FOR') >> OP('(') >> Expression_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
 	Monad<Parser>* FUNCTION = Type >> Type_F >> Identify_F >> OP('(') >> Arg_List_F >> OP(')') >> OP('{') >> Body_F >> OP('}');
-	
+	Monad<Parser>* CLASS = Keyword_F('CLASS') >> Identify_F >> OP('{') >> Body_F >> OP('}'); 
 	cout << parserS->val->id << endl;
 	//wcout << TS(val) << endl;
 	getchar();
