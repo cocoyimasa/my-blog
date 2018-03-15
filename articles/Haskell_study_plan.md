@@ -1,5 +1,7 @@
 ## Haskell Study Plan
+
 Note : Parentheses ( ), Brackets [ ], and Braces { } 
+
 Basic code area
 
 ```haskell
