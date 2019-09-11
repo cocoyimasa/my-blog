@@ -1,2 +1,2 @@
 console.log('from github.com');
-window.divShow = false;
+window.divShow = true;
